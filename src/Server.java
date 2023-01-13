@@ -380,7 +380,7 @@ public class Server extends JFrame implements ActionListener, ChangeListener {
     if (fec) label = " fec ";
     else label = " media ";
     // TASK correct the if-instruction to work properly
-    if (random.nextDouble() > 0.0) {
+    if (random.nextDouble() > lossRate) {
       logger.log(Level.FINE, "Send frame: " + imagenb + label);
       RTPsocket.send(senddp);
     } else {
@@ -517,7 +517,7 @@ public class Server extends JFrame implements ActionListener, ChangeListener {
    */
   //TASK Complete the OPTIONS response
   private String options() {
-    return "....";
+    return "Public: DESCRIBE,SETUP,TEARDOWN,PLAY,PAUSE" + CRLF;
   }
 
 
@@ -526,21 +526,29 @@ public class Server extends JFrame implements ActionListener, ChangeListener {
   private String describe() {
     StringWriter rtspHeader = new StringWriter();
     StringWriter rtspBody = new StringWriter();
-    VideoMetadata meta = Server.getVideoMetadata(VideoFileName);
+    // VideoMetadata meta = Server.getVideoMetadata(VideoFileName);
 
     // Write the body first so we can get the size later
     rtspBody.write("v=0" + CRLF);
-    rtspBody.write("...");
-    rtspBody.write("...");
-    rtspBody.write("...");
+    rtspBody.write("o=Me 2808844564 2808844564 IN IP4 localhost"+ CRLF);
+    rtspBody.write("s=" + CRLF);
+    rtspBody.write("c=IN IP4 localhost" + CRLF);
+    rtspBody.write("m=video 2000 RTP/AVP 26" + CRLF);
+    rtspBody.write("a=rtpmap:26 JPEG/90000"+ CRLF);
 
-    rtspHeader.write("Content-Base: " + "");
-    rtspHeader.write("Content-Type: " + "");
-    rtspHeader.write("Content-Length: " + "");
+    rtspHeader.write("Content-Base: " + "rtsp://localhost:3333/htw.mjpeg"+ CRLF);
+    rtspHeader.write("Content-Type: " + "application/sdp" + CRLF);
+    rtspHeader.write("Content-Length: " + rtspBody.toString().getBytes().length + CRLF);
     rtspHeader.write(CRLF);
 
     return rtspHeader.toString() + rtspBody.toString();
   }
+  /* The code starts by creating a StringWriter object called rtspHeader.
+ This is used to write the header of an RTP packet that will be sent over UDP port 3333.
+ The first line in the code creates a StringWriter object called rtspBody, which is used to send data over UDP port 3333.
+ The next line sends the string "v=0" + CRLF, followed by "o=Me 2808844564 2808844564 IN IP4 localhost"+ CRLF and then sending "s=" + CRLF and finally sending "c=IN IP4 localhost".
+ These lines are all part of one RTP packet with different fields for each field in the packet.
+ The code is used to describe the video file that is being sent. */
 
   private void initGuiEncryption(JPanel panel) {
     GridBagConstraints gbc = new GridBagConstraints();
